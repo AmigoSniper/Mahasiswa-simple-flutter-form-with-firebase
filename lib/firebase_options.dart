@@ -41,46 +41,46 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAa56Lo5c3s5IFvsUq013FPFz8JZuK_3aI',
-    appId: '1:496778702285:web:b4a78ee66775c6a786a884',
-    messagingSenderId: '496778702285',
-    projectId: 'form-eec11',
-    authDomain: 'form-eec11.firebaseapp.com',
-    storageBucket: 'form-eec11.appspot.com',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    authDomain: '',
+    storageBucket: '',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCKfqy8MJ1BFO2bA7IrHhrc2mQITanBysw',
-    appId: '1:496778702285:android:f3e2a90c722336cc86a884',
-    messagingSenderId: '496778702285',
-    projectId: 'form-eec11',
-    storageBucket: 'form-eec11.appspot.com',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    storageBucket: '',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDSJflkjnEO3oeFIEtrQA5W7tbGD94DuG4',
-    appId: '1:496778702285:ios:99e7399c14fb1c5486a884',
-    messagingSenderId: '496778702285',
-    projectId: 'form-eec11',
-    storageBucket: 'form-eec11.appspot.com',
-    iosBundleId: 'com.example.formfirebase',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    storageBucket: '',
+    iosBundleId: '',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDSJflkjnEO3oeFIEtrQA5W7tbGD94DuG4',
-    appId: '1:496778702285:ios:99e7399c14fb1c5486a884',
-    messagingSenderId: '496778702285',
-    projectId: 'form-eec11',
-    storageBucket: 'form-eec11.appspot.com',
-    iosBundleId: 'com.example.formfirebase',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    storageBucket: '',
+    iosBundleId: '',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAa56Lo5c3s5IFvsUq013FPFz8JZuK_3aI',
-    appId: '1:496778702285:web:2037d7e740cc8c9186a884',
-    messagingSenderId: '496778702285',
-    projectId: 'form-eec11',
-    authDomain: 'form-eec11.firebaseapp.com',
-    storageBucket: 'form-eec11.appspot.com',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    authDomain: '',
+    storageBucket: '',
   );
 }
