@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "496778702285",
+    "project_id": "form-eec11",
+    "storage_bucket": "form-eec11.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:496778702285:android:f3e2a90c722336cc86a884",
+        "android_client_info": {
+          "package_name": "com.example.formfirebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKfqy8MJ1BFO2bA7IrHhrc2mQITanBysw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
