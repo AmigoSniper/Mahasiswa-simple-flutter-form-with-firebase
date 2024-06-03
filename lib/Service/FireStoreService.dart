@@ -6,14 +6,15 @@ class FireStoreService {
       FirebaseFirestore.instance.collection('mahasiswa');
   //create
   Future<void> addmahasiswa(int NIM, String Nama, String JenisKelamin,
-      String TanggalLahir, String Sekolah, String Jurusan) {
+      String TanggalLahir, String Sekolah, String Jurusan, String ProfileUrl) {
     return mahasiswa.add({
       'NIM': NIM,
       'Nama': Nama,
       'JenisKelamin': JenisKelamin,
       'TanggalLahir': TanggalLahir,
       'Sekolah': Sekolah,
-      'Jurusan': Jurusan
+      'Jurusan': Jurusan,
+      'Profile': ProfileUrl,
     });
   }
 
@@ -32,14 +33,16 @@ class FireStoreService {
       String JenisKelamin,
       String TanggalLahir,
       String Sekolah,
-      String Jurusan) {
+      String Jurusan,
+      String ProfileUrl) {
     return mahasiswa.doc(ID).update({
       'NIM': NIM,
       'Nama': Nama,
       'JenisKelamin': JenisKelamin,
       'TanggalLahir': TanggalLahir,
       'Sekolah': Sekolah,
-      'Jurusan': Jurusan
+      'Jurusan': Jurusan,
+      'Profile': ProfileUrl,
     });
   }
 

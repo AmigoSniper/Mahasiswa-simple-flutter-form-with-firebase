@@ -1,10 +1,19 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unused_local_variable
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:form_builder_image_picker/form_builder_image_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+// import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:formfirebase/Service/FireStoreService.dart';
+import 'package:formfirebase/Service/FireStorage.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'DetailPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,12 +24,20 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FireStoreService fireStore = new FireStoreService();
+  final Firestorage storage = new Firestorage();
   final TextEditingController nimController = TextEditingController();
   final TextEditingController namaController = TextEditingController();
   final TextEditingController tanggalLahirController = TextEditingController();
   final TextEditingController sekolahController = TextEditingController();
+  final ImagePicker picker = ImagePicker();
+  late File photo;
+  late File editphoto;
+  CroppedFile? _croppedFile;
+
   var JurusanMahasiswa;
   var Kelamin;
+  var profileURL;
+  var pathprofile;
 
   List<String> ListJurusan = [
     'D3-Teknologi Informasi',
@@ -70,7 +87,6 @@ class _HomePageState extends State<HomePage> {
     'D-III Akuntansi',
     'D-III Teknologi Informasi'
   ];
-
   final ScrollController _firstController = ScrollController();
 
   final _formKey = GlobalKey<FormBuilderState>();
@@ -109,13 +125,42 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> CropImage(XFile _pickedFile) async {
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: _pickedFile.path,
+      compressFormat: ImageCompressFormat.jpg,
+      aspectRatioPresets: [CropAspectRatioPreset.square],
+      compressQuality: 50,
+      uiSettings: [
+        AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: Colors.blue,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        IOSUiSettings(
+          title: 'Cropper',
+        ),
+      ],
+    );
+    if (croppedFile != null) {
+      setState(() {
+        _croppedFile = croppedFile;
+      });
+    }
+  }
+
   void clear() {
-    _formKey.currentState?.reset();
     _formKey.currentState!.fields['Jurusan']?.reset();
+    _formKey.currentState!.fields['NIM']?.reset();
     nimController.clear();
     namaController.clear();
     tanggalLahirController.clear();
     sekolahController.clear();
+    pathprofile = '';
+    profileURL = '';
+    JurusanMahasiswa = null;
+    _croppedFile = null;
   }
 
   void addMahasiswa() {
@@ -134,6 +179,36 @@ class _HomePageState extends State<HomePage> {
                         key: _formKey,
                         child: Column(
                           children: [
+                            FormBuilderImagePicker(
+                              name: 'Profil',
+                              decoration: const InputDecoration(
+                                  labelText: 'Photo Profil'),
+                              maxImages: 1,
+                              transformImageWidget: (context, displayImage) =>
+                                  Card(
+                                      shape: const CircleBorder(),
+                                      clipBehavior: Clip.antiAlias,
+                                      child: Center(
+                                        child: SizedBox.square(
+                                          child: displayImage,
+                                        ),
+                                      )),
+                              availableImageSources: [
+                                ImageSourceOption.gallery,
+                                ImageSourceOption.camera
+                              ],
+                              onChanged: (value) {
+                                setState(() async {
+                                  XFile image = value!.first;
+                                  await CropImage(image);
+                                  pathprofile = _croppedFile?.path;
+                                  print("Letak File ${pathprofile}");
+                                  photo = File(pathprofile);
+                                  print("Letak photo ${photo.path}");
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 10),
                             FormBuilderTextField(
                               controller: nimController,
                               keyboardType: TextInputType.number,
@@ -145,10 +220,6 @@ class _HomePageState extends State<HomePage> {
                               decoration: InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'NIM'),
-                              validator: FormBuilderValidators.compose([
-                                FormBuilderValidators.integer(),
-                                FormBuilderValidators.equalLength(10),
-                              ]),
                             ),
                             const SizedBox(height: 20),
                             FormBuilderTextField(
@@ -234,9 +305,11 @@ class _HomePageState extends State<HomePage> {
                             ),
                             const SizedBox(height: 10),
                             MaterialButton(
-                                child: Text("Save"),
-                                color: Colors.green,
-                                onPressed: () {
+                              child: Text("Save"),
+                              color: Colors.green,
+                              onPressed: () async {
+                                setState(() async {
+                                  print("Letak photo 2 ${photo.path}");
                                   int NomerInduk =
                                       int.parse(nimController.text);
                                   fireStore.addmahasiswa(
@@ -245,10 +318,13 @@ class _HomePageState extends State<HomePage> {
                                       Kelamin,
                                       tanggalLahirController.text,
                                       sekolahController.text,
-                                      JurusanMahasiswa);
+                                      JurusanMahasiswa,
+                                      await storage.Upload(photo, NomerInduk));
                                   clear();
                                   Navigator.pop(context);
-                                }),
+                                });
+                              },
+                            ),
                             const SizedBox(height: 10),
                             MaterialButton(
                                 child: Text("Reset"),
@@ -267,7 +343,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void editMahasiswa(String? ID, int NIM, String Nama, String JenisKelamin,
-      String TanggalLahir, String Sekolah, String Jurusan) {
+      String TanggalLahir, String Sekolah, String Jurusan, String ProfileLink) {
     final TextEditingController nimEdit =
         TextEditingController(text: NIM.toString());
     final TextEditingController namaEdit = TextEditingController(text: Nama);
@@ -277,6 +353,7 @@ class _HomePageState extends State<HomePage> {
         TextEditingController(text: Sekolah);
     String? JurusanEdit = Jurusan;
     String? KelaminEdit = JenisKelamin;
+    String? ProfileBaru;
 
     showDialog(
         context: context,
@@ -293,8 +370,41 @@ class _HomePageState extends State<HomePage> {
                         key: _formKey,
                         child: Column(
                           children: [
+                            FormBuilderImagePicker(
+                              name: 'Profil',
+                              decoration: const InputDecoration(
+                                  labelText: 'Photo Profil'),
+                              maxImages: 1,
+                              transformImageWidget: (context, displayImage) =>
+                                  Card(
+                                      shape: const CircleBorder(),
+                                      clipBehavior: Clip.antiAlias,
+                                      child: Center(
+                                        child: SizedBox.square(
+                                          child: displayImage,
+                                        ),
+                                      )),
+                              availableImageSources: [
+                                ImageSourceOption.gallery,
+                                ImageSourceOption.camera
+                              ],
+                              onChanged: (value) {
+                                setState(() async {
+                                  XFile imageEdit = value!.first;
+                                  await CropImage(imageEdit);
+                                  pathprofile = _croppedFile?.path;
+                                  print(value.length);
+                                  pathprofile = imageEdit.path;
+                                  print("Letak File ${pathprofile}");
+                                  editphoto = File(pathprofile);
+                                  print("Letak photo ${editphoto.path}");
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 10),
                             FormBuilderTextField(
                               controller: nimEdit,
+                              enabled: false,
                               keyboardType: TextInputType.number,
                               name: 'NIM',
                               onSubmitted: (value) {
@@ -304,10 +414,6 @@ class _HomePageState extends State<HomePage> {
                               decoration: InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'NIM'),
-                              validator: FormBuilderValidators.compose([
-                                FormBuilderValidators.integer(),
-                                FormBuilderValidators.equalLength(10),
-                              ]),
                             ),
                             const SizedBox(height: 20),
                             FormBuilderTextField(
@@ -323,7 +429,7 @@ class _HomePageState extends State<HomePage> {
                                 border: OutlineInputBorder(),
                                 labelText: 'Jenis Kelamin',
                               ),
-                              initialValue: null,
+                              initialValue: '${JenisKelamin}',
                               onChanged: (value) {
                                 setState(() {
                                   KelaminEdit = value;
@@ -366,7 +472,7 @@ class _HomePageState extends State<HomePage> {
                             const SizedBox(height: 10),
                             FormBuilderDropdown<String>(
                               name: 'Jurusan',
-                              initialValue: '',
+                              initialValue: '${Jurusan}',
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
                                 labelText: 'Jurusan',
@@ -393,10 +499,15 @@ class _HomePageState extends State<HomePage> {
                             ),
                             const SizedBox(height: 10),
                             MaterialButton(
-                                child: Text("Save"),
-                                color: Colors.green,
-                                onPressed: () {
-                                  int NomerInduk = int.parse(nimEdit.text);
+                              child: Text("Save"),
+                              color: Colors.green,
+                              onPressed: () async {
+                                int NomerInduk = int.parse(nimEdit.text);
+                                await storage.deletePhoto(ProfileLink);
+                                String editpath =
+                                    await storage.Upload(editphoto, NomerInduk);
+                                setState(() {
+                                  print("Letak photo 2 ${editphoto.path}");
                                   fireStore.updatemahasiswa(
                                       ID!,
                                       NomerInduk,
@@ -404,10 +515,13 @@ class _HomePageState extends State<HomePage> {
                                       KelaminEdit!,
                                       tanggallahirEdit.text,
                                       sekolahEdit.text,
-                                      Jurusan);
+                                      Jurusan,
+                                      editpath);
                                   clear();
                                   Navigator.pop(context);
-                                }),
+                                });
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -447,10 +561,13 @@ class _HomePageState extends State<HomePage> {
                 String TanggalLahir = data['TanggalLahir'];
                 String Sekolah = data['Sekolah'];
                 String Jurusan = data['Jurusan'];
+                String ProfileLink = data['Profile'];
 
                 return Card(
                   child: ListTile(
-                    leading: const Icon(Icons.man),
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(ProfileLink),
+                    ),
                     title: Text(Nama),
                     tileColor: Colors.cyan,
                     trailing: Row(
@@ -459,12 +576,13 @@ class _HomePageState extends State<HomePage> {
                         IconButton(
                             onPressed: () {
                               fireStore.deletemahasiswa(ID);
+                              storage.deletePhoto(ProfileLink);
                             },
                             icon: Icon(Icons.delete)),
                         IconButton(
                             onPressed: () {
                               editMahasiswa(ID, NIM, Nama, JenisKelamin,
-                                  TanggalLahir, Sekolah, Jurusan);
+                                  TanggalLahir, Sekolah, Jurusan, ProfileLink);
                             },
                             icon: Icon(Icons.edit))
                       ],
@@ -472,51 +590,14 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute<Widget>(
                           builder: (BuildContext context) {
-                        return Scaffold(
-                          appBar: AppBar(title: Text('$Nama')),
-                          body: ListView(
-                            padding: EdgeInsets.all(20.0),
-                            children: <Widget>[
-                              Card(
-                                elevation: 5,
-                                child: Padding(
-                                  padding: EdgeInsets.all(20.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      ListTile(
-                                        leading: Icon(Icons.perm_identity),
-                                        title: Text('NIM: $NIM'),
-                                      ),
-                                      ListTile(
-                                        leading: Icon(Icons.person),
-                                        title: Text('Nama: $Nama'),
-                                      ),
-                                      ListTile(
-                                        leading: Icon(Icons.wc),
-                                        title: Text(
-                                            'Jenis Kelamin: $JenisKelamin'),
-                                      ),
-                                      ListTile(
-                                        leading: Icon(Icons.cake),
-                                        title: Text(
-                                            'Tanggal Lahir: $TanggalLahir'),
-                                      ),
-                                      ListTile(
-                                        leading: Icon(Icons.school),
-                                        title: Text('Sekolah: $Sekolah'),
-                                      ),
-                                      ListTile(
-                                        leading: Icon(Icons.school_outlined),
-                                        title: Text('Jurusan: $Jurusan'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
+                        return Detailpage(
+                          nama: Nama,
+                          nim: NIM,
+                          jenisKelamin: JenisKelamin,
+                          tanggalLahir: TanggalLahir,
+                          sekolah: Sekolah,
+                          jurusan: Jurusan,
+                          ProfileURL: ProfileLink,
                         );
                       }));
                     },
