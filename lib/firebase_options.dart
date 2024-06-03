@@ -41,47 +41,48 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyB6ShlYOUygEQwXCqU10CnpbsGkEN8yXgE',
-    appId: '1:112165943464:web:f1724b2e9c42cb1cb9aa9d',
-    messagingSenderId: '112165943464',
-    projectId: 'formflutter-5f8dd',
-    authDomain: 'formflutter-5f8dd.firebaseapp.com',
-    storageBucket: 'formflutter-5f8dd.appspot.com',
-  );
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    authDomain: '',
+    storageBucket: '',
+);
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyClIAtf8-u0gDrp-gsMoLO8xXmYzwyRBnQ',
-    appId: '1:112165943464:android:43f5a12d1f817a58b9aa9d',
-    messagingSenderId: '112165943464',
-    projectId: 'formflutter-5f8dd',
-    storageBucket: 'formflutter-5f8dd.appspot.com',
-  );
+static const FirebaseOptions android = FirebaseOptions(
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    storageBucket: '',
+);
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAoWJzDG-sONXAQGRqGccsqG8W6OrEzO4M',
-    appId: '1:112165943464:ios:b2caad6e325af277b9aa9d',
-    messagingSenderId: '112165943464',
-    projectId: 'formflutter-5f8dd',
-    storageBucket: 'formflutter-5f8dd.appspot.com',
-    iosBundleId: 'com.example.formfirebase',
-  );
+static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    storageBucket: '',
+    iosBundleId: '',
+);
 
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAoWJzDG-sONXAQGRqGccsqG8W6OrEzO4M',
-    appId: '1:112165943464:ios:b2caad6e325af277b9aa9d',
-    messagingSenderId: '112165943464',
-    projectId: 'formflutter-5f8dd',
-    storageBucket: 'formflutter-5f8dd.appspot.com',
-    iosBundleId: 'com.example.formfirebase',
-  );
+static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    storageBucket: '',
+    iosBundleId: '',
+);
 
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyB6ShlYOUygEQwXCqU10CnpbsGkEN8yXgE',
-    appId: '1:112165943464:web:d72bcec2865f77fcb9aa9d',
-    messagingSenderId: '112165943464',
-    projectId: 'formflutter-5f8dd',
-    authDomain: 'formflutter-5f8dd.firebaseapp.com',
-    storageBucket: 'formflutter-5f8dd.appspot.com',
-  );
+static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
+    projectId: '',
+    authDomain: '',
+    storageBucket: '',
+);
+
 
 }
